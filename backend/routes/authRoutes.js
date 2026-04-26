@@ -28,6 +28,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET — Reset admin password
+router.get('/reset-admin', async (req, res) => {
+  try {
+    const admin = await User.findOne({ role: 'admin' });
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    admin.password = 'Eppic2025';
+    await admin.save();
+    res.json({ message: 'Password reset successfully!', email: admin.email, password: 'Eppic2025' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET — Seed admin account (run once in browser)
 router.get('/seed-admin', async (req, res) => {
   try {
