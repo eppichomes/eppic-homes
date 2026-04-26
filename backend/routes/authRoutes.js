@@ -28,6 +28,23 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET — Seed admin account (run once in browser)
+router.get('/seed-admin', async (req, res) => {
+  try {
+    const exists = await User.findOne({ role: 'admin' });
+    if (exists) return res.status(400).json({ message: 'Admin already exists', email: exists.email });
+    const admin = await User.create({
+      name: 'Eppic Admin',
+      email: process.env.ADMIN_EMAIL || 'godfreywarigia@gmail.com',
+      password: process.env.ADMIN_PASSWORD || 'EppicAdmin2025!',
+      role: 'admin',
+    });
+    res.status(201).json({ message: 'Admin created successfully!', email: admin.email });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // POST — Seed admin account (run once)
 router.post('/seed-admin', async (req, res) => {
   try {
