@@ -5,11 +5,14 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Kitchen', 'Storage', 'Cleaning', 'Bathroom', 'Decor', 'Cooking']
+    enum: ['Automobile', 'Baby Products', 'Books, Movies and Music', 'Computing', 'Electronics', 'Fashion', 'Gaming', 'Garden & Out
   },
   price: { type: Number, required: true },
   oldPrice: { type: Number, default: null },
   description: { type: String, required: true },
+
+
+
   images: [{ type: String }],
   stock: { type: Number, required: true, default: 0 },
   inStock: { type: Boolean, default: true },
