@@ -12,7 +12,6 @@ router.get('/', async (req, res) => {
     if (category) filter.category = category;
     if (featured) filter.featured = true;
     if (search) filter.name = { $regex: search, $options: 'i' };
-
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
@@ -32,12 +31,19 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST create product (admin only)
-router.post('/', protect, adminOnly, upload.array('images', 4), async (req, res) => {
+router.post('/', protect, adminOnly, upload.array('images', 8), async (req, res) => {
   try {
     const { name, category, price, oldPrice, description, stock, featured, badge } = req.body;
-    const images = req.files ? req.files.map(f => f.path) : [];
-    const sku = `EHC-${Date.now()}`;
 
+    // Accept images from file upload OR from JSON body (URLs)
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(f => f.path);
+    } else if (req.body.images) {
+      images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+    }
+
+    const sku = req.body.sku || `EHC-${Date.now()}`;
     const product = await Product.create({
       name, category, price, oldPrice, description,
       stock, featured, badge, images, sku
@@ -49,17 +55,17 @@ router.post('/', protect, adminOnly, upload.array('images', 4), async (req, res)
 });
 
 // PUT update product (admin only)
-router.put('/:id', protect, adminOnly, upload.array('images', 4), async (req, res) => {
+router.put('/:id', protect, adminOnly, upload.array('images', 8), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-
     const fields = ['name', 'category', 'price', 'oldPrice', 'description', 'stock', 'featured', 'badge'];
     fields.forEach(f => { if (req.body[f] !== undefined) product[f] = req.body[f]; });
     if (req.files && req.files.length > 0) {
       product.images = req.files.map(f => f.path);
+    } else if (req.body.images) {
+      product.images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
     }
-
     await product.save();
     res.json(product);
   } catch (err) {
