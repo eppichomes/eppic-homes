@@ -136,7 +136,7 @@ export default function Checkout() {
               Click Pay below. You'll receive a prompt on <strong>{form.phone}</strong>. Enter your M-Pesa PIN to complete.
             </div>
             <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 6, padding: '8px 10px', fontSize: 12, color: '#085041' }}>
-              Paybill: <strong>123456</strong> · Account: {form.phone} · Amount: <strong>{fmt(finalTotal)}</strong>
+              Till: <strong>8068106</strong> · Account: {form.phone} · Amount: <strong>{fmt(finalTotal)}</strong>
             </div>
           </div>
 
@@ -171,7 +171,7 @@ export default function Checkout() {
             <div style={{ fontSize: 32, marginBottom: 8 }}>📲</div>
             {payMode === 'stk'
               ? <p style={{ fontSize: 13, color: '#0F6E56' }}>An STK Push has been sent to <strong>{form.phone}</strong>. Enter your M-Pesa PIN on your phone, then enter the confirmation code below.</p>
-              : <p style={{ fontSize: 13, color: '#0F6E56' }}>Please pay <strong>{fmt(finalTotal)}</strong> to Paybill <strong>123456</strong>, Account: <strong>{form.phone}</strong>. Then enter your M-Pesa confirmation code below.</p>
+              : <p style={{ fontSize: 13, color: '#0F6E56' }}>Please send <strong>{fmt(finalTotal)}</strong> to Till Number <strong>8068106</strong> (Godfrey Warigia). Then enter your M-Pesa confirmation code below.</p>
             }
           </div>
           <div style={{ marginBottom: 14 }}>
