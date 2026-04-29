@@ -20,7 +20,7 @@ export default function Navbar() {
       {/* Top bar */}
       <div style={{ background: '#1A3D1C', color: 'rgba(255,255,255,0.7)', fontSize: 11, padding: '6px 16px', display: 'flex', justifyContent: 'space-between' }}>
         <span>Free delivery on orders over <strong style={{ color: '#FAC775' }}>KES 2,000</strong> within Nairobi</span>
-        <span>📞 0712 345 678</span>
+        <span>📞 0746 251 745</span>
       </div>
 
       {/* Main nav */}
@@ -54,7 +54,7 @@ export default function Navbar() {
             </span>
           </button>
 
-          <a href={`https://wa.me/${process.env.REACT_APP_SHOP_WHATSAPP || '254712345678'}`}
+          <a href={`https://wa.me/${process.env.REACT_APP_SHOP_WHATSAPP || '254746251745'}`}
             target="_blank" rel="noreferrer"
             style={{ background: '#25D366', border: 'none', borderRadius: 20, padding: '6px 12px', color: '#fff', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
             WhatsApp
