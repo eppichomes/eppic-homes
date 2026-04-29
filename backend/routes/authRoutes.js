@@ -1,17 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
+
+// Rate limiter: max 5 login attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: 'Too many login attempts. Please try again after 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
-// POST — Admin/Customer Login
-router.post('/login', async (req, res) => {
+// POST — Login (rate limited)
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
 
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -24,56 +39,45 @@ router.post('/login', async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Server error. Please try again.' });
   }
 });
 
-// GET — Reset admin password
-router.get('/reset-admin', async (req, res) => {
+// POST — Register customer account
+router.post('/register', loginLimiter, async (req, res) => {
   try {
-    const admin = await User.findOne({ role: 'admin' });
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
-    admin.password = 'Eppic2025';
-    await admin.save();
-    res.json({ message: 'Password reset successfully!', email: admin.email, password: 'Eppic2025' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    const { name, email, password, phone } = req.body;
 
-// GET — Seed admin account (run once in browser)
-router.get('/seed-admin', async (req, res) => {
-  try {
-    const exists = await User.findOne({ role: 'admin' });
-    if (exists) return res.status(400).json({ message: 'Admin already exists', email: exists.email });
-    const admin = await User.create({
-      name: 'Eppic Admin',
-      email: process.env.ADMIN_EMAIL || 'godfreywarigia@gmail.com',
-      password: process.env.ADMIN_PASSWORD || 'EppicAdmin2025!',
-      role: 'admin',
-    });
-    res.status(201).json({ message: 'Admin created successfully!', email: admin.email });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email and password are required.' });
+    }
 
-// POST — Seed admin account (run once)
-router.post('/seed-admin', async (req, res) => {
-  try {
-    const exists = await User.findOne({ role: 'admin' });
-    if (exists) return res.status(400).json({ message: 'Admin already exists' });
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+    }
 
-    const admin = await User.create({
-      name: 'Eppic Admin',
-      email: process.env.ADMIN_EMAIL || 'admin@eppichomes.co.ke',
-      password: process.env.ADMIN_PASSWORD || 'Admin@2025',
-      role: 'admin',
+    const exists = await User.findOne({ email: email.toLowerCase().trim() });
+    if (exists) {
+      return res.status(400).json({ message: 'An account with this email already exists.' });
+    }
+
+    const user = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      password,
+      phone: phone || '',
+      role: 'customer',
     });
 
-    res.status(201).json({ message: 'Admin created', email: admin.email });
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Server error. Please try again.' });
   }
 });
 
