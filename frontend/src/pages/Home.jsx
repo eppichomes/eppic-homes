@@ -122,7 +122,7 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
             {[...Array(6)].map((_, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: 8, overflow: 'hidden', border: '1px solid #E0E0E0' }}>
                 <div style={{ height: 160, background: 'linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)', backgroundSize: '200% 100%' }} />
@@ -143,7 +143,7 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
             {products.map(p => {
               const disc = discount(p);
               return (
